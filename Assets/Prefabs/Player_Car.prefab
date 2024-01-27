@@ -331,7 +331,7 @@ WheelCollider:
     m_ExtremumValue: 1
     m_AsymptoteSlip: 0.5
     m_AsymptoteValue: 0.75
-    m_Stiffness: 2
+    m_Stiffness: 1.5
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -359,6 +359,7 @@ MonoBehaviour:
   driftEffect: {fileID: 0}
   skidmarksController: {fileID: 0}
   wheelMesh: {fileID: 8044842310908923450}
+  onGround: 1
 --- !u!2083052967 &7342604315225182001
 VisualEffect:
   m_ObjectHideFlags: 0
@@ -459,6 +460,7 @@ GameObject:
   - component: {fileID: 3079577870775076122}
   - component: {fileID: 1513860687057971754}
   - component: {fileID: 8683443477862063730}
+  - component: {fileID: 6178227363958717249}
   m_Layer: 0
   m_Name: Player_Car
   m_TagString: Untagged
@@ -568,7 +570,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4887649017159947164}
   serializedVersion: 4
-  m_Mass: 800
+  m_Mass: 400
   m_Drag: 0.1
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -586,7 +588,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 2
 --- !u!114 &3718416466507251527
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -733,6 +735,31 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!145 &6178227363958717249
+SpringJoint:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4887649017159947164}
+  serializedVersion: 3
+  m_ConnectedBody: {fileID: 0}
+  m_ConnectedArticulationBody: {fileID: 0}
+  m_Anchor: {x: 0, y: -1, z: 0}
+  m_Axis: {x: 1, y: 0, z: 0}
+  m_AutoConfigureConnectedAnchor: 0
+  m_ConnectedAnchor: {x: 0, y: 0, z: 0}
+  m_Spring: 0
+  m_Damper: 1
+  m_MinDistance: 0
+  m_MaxDistance: 10
+  m_Tolerance: 0.025
+  m_BreakForce: Infinity
+  m_BreakTorque: Infinity
+  m_EnableCollision: 1
+  m_EnablePreprocessing: 1
+  m_MassScale: 1
+  m_ConnectedMassScale: 1
 --- !u!1 &5153437698500249756
 GameObject:
   m_ObjectHideFlags: 0
@@ -825,6 +852,7 @@ MonoBehaviour:
   driftEffect: {fileID: 0}
   skidmarksController: {fileID: 0}
   wheelMesh: {fileID: 8288700916165111153}
+  onGround: 1
 --- !u!2083052967 &1503495097947063308
 VisualEffect:
   m_ObjectHideFlags: 0
@@ -1000,6 +1028,7 @@ MonoBehaviour:
   driftEffect: {fileID: 0}
   skidmarksController: {fileID: 0}
   wheelMesh: {fileID: 7897134885266704194}
+  onGround: 1
 --- !u!2083052967 &4030537730059144852
 VisualEffect:
   m_ObjectHideFlags: 0
@@ -1093,8 +1122,13 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4240971826767053405, guid: 731d5be56400fba4984e883ff9b8b2ce,
         type: 3}
+      propertyPath: m_ForwardFriction.m_Stiffness
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4240971826767053405, guid: 731d5be56400fba4984e883ff9b8b2ce,
+        type: 3}
       propertyPath: m_SidewaysFriction.m_Stiffness
-      value: 2
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 5799730952911196110, guid: 731d5be56400fba4984e883ff9b8b2ce,
         type: 3}
