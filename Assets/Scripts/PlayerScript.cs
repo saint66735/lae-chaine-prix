@@ -24,7 +24,7 @@ public class PlayerScript : NetworkBehaviour
     public float brakeTorque = 2000;
     public float maxSpeed = 50;
     public float steeringRange = 30;
-    public float steeringRangeAtMaxSpeed = 10;
+    public float steeringRangeAtMaxSpeed = 15;
     public float centreOfGravityOffset = -1f;
     
     void Start() {
@@ -82,15 +82,27 @@ public class PlayerScript : NetworkBehaviour
         //}
         horizontalInput = Input.GetAxis("Horizontal");
         verticalInput = Input.GetAxis("Vertical");
+        var handbrakeInput = Input.GetButton("Jump");
         if (IsOwner && Application.isFocused)
-        ControlCarServerRpc(horizontalInput, verticalInput);
+        ControlCarServerRpc(new UserInputStruct(horizontalInput, verticalInput, handbrakeInput));
         //transform.Translate();
     }
+    
+    struct UserInputStruct : INetworkSerializeByMemcpy {
+        public float horizontalInput;
+        public float verticalInput;
+        public bool handbrakeInput;
 
+        public UserInputStruct(float horizontalInput, float verticalInput, bool handbrakeInput) {
+            this.horizontalInput = horizontalInput;
+            this.verticalInput = verticalInput;
+            this.handbrakeInput = handbrakeInput;
+        }
+    }
   
 
     [ServerRpc]
-    void ControlCarServerRpc(float horizontalInput, float verticalInput, ServerRpcParams rpcParams = default) {
+    void ControlCarServerRpc(UserInputStruct t, ServerRpcParams rpcParams = default) {
         float forwardSpeed = Vector3.Dot(transform.forward, rigidBody.velocity);
 
 
@@ -101,27 +113,29 @@ public class PlayerScript : NetworkBehaviour
         // Use that to calculate how much torque is available 
         // (zero torque at top speed)
         float currentMotorTorque = Mathf.Lerp(motorTorque, 0, speedFactor);
-        exhaustEffect.SetFloat("Exhaust", 10+verticalInput * 200);
+        exhaustEffect.SetFloat("Exhaust", 10+t.verticalInput * 200);
         
         
-        movedirection = new Vector3(horizontalInput, 0, verticalInput);
+        movedirection = new Vector3(t.horizontalInput, 0, t.verticalInput);
         float currentSteerRange = Mathf.Lerp(steeringRange, steeringRangeAtMaxSpeed, speedFactor);
-        bool isAccelerating = Mathf.Sign(verticalInput) == Mathf.Sign(forwardSpeed);
-
+        bool isAccelerating = Mathf.Sign(t.verticalInput) == Mathf.Sign(forwardSpeed);
+        Debug.Log(t.handbrakeInput);
         foreach (var wheel in wheels) {
-            
-            wheel.wheelCollider.motorTorque = verticalInput * currentMotorTorque;
+            if (wheel.acceleratingAllowed) {
+                wheel.wheelCollider.motorTorque = t.verticalInput * currentMotorTorque;
+            }
+
             if (wheel.turningAllowed)
             {
-                wheel.wheelCollider.steerAngle = horizontalInput * currentSteerRange;
+                wheel.wheelCollider.steerAngle = t.horizontalInput * currentSteerRange;
             }
-            
+            /*
             if (isAccelerating)
             {
                 // Apply torque to Wheel colliders that have "Motorized" enabled
                 if (wheel.acceleratingAllowed)
                 {
-                    wheel.wheelCollider.motorTorque = verticalInput * currentMotorTorque;
+                    wheel.wheelCollider.motorTorque = t.verticalInput * currentMotorTorque;
                 }
                 wheel.wheelCollider.brakeTorque = 0;
             }
@@ -129,10 +143,28 @@ public class PlayerScript : NetworkBehaviour
             {
                 // If the user is trying to go in the opposite direction
                 // apply brakes to all wheels
-                wheel.wheelCollider.brakeTorque = Mathf.Abs(verticalInput) * brakeTorque;
+                wheel.wheelCollider.brakeTorque = Mathf.Abs(t.verticalInput) * brakeTorque;
+                wheel.wheelCollider.motorTorque = 0;
+            }*/
+
+            if (t.handbrakeInput && wheel.acceleratingAllowed) {
+                wheel.wheelCollider.brakeTorque = brakeTorque;
                 wheel.wheelCollider.motorTorque = 0;
             }
+            else {
+                wheel.wheelCollider.brakeTorque = 0;
+            }
 
+            WheelHit hit = new WheelHit();
+            if (wheel.wheelCollider.GetGroundHit(out hit)) {
+                //wheel.driftEffect.
+                if (hit.sidewaysSlip > .3 || hit.sidewaysSlip < -.3) {
+                    wheel.driftEffect.SendEvent("OnStartDrift");
+                }
+                else {
+                    wheel.driftEffect.SendEvent("OnStopDrift");
+                }
+            }
         }
     }
 }

@@ -2,18 +2,21 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.VFX;
 
 public class WheelScript : MonoBehaviour {
     public bool turningAllowed;
     public bool acceleratingAllowed;
 
     public WheelCollider wheelCollider;
+    public VisualEffect driftEffect;
 
     public Transform wheelMesh;
     // Start is called before the first frame update
     void Start()
     {
         wheelCollider = GetComponent<WheelCollider>();
+        driftEffect = GetComponent<VisualEffect>();
     }
 
     // Update is called once per frame
