@@ -7,11 +7,13 @@ public class WheelScript : MonoBehaviour {
     public bool turningAllowed;
     public bool acceleratingAllowed;
 
-    public WheelCollider collider;
+    public WheelCollider wheelCollider;
+
+    public Transform wheelMesh;
     // Start is called before the first frame update
     void Start()
     {
-        collider = GetComponent<WheelCollider>();
+        wheelCollider = GetComponent<WheelCollider>();
     }
 
     // Update is called once per frame
@@ -19,11 +21,11 @@ public class WheelScript : MonoBehaviour {
     {
         Vector3 position;
         Quaternion rotation;
-        var wh = GetComponentsInChildren<MeshFilter>()[0].transform;
-        collider.GetWorldPose(out position, out rotation);
+        //var wh = GetComponentsInChildren<MeshFilter>()[0].transform;
+        wheelCollider.GetWorldPose(out position, out rotation);
         //wheel.transform.position = Vector3.Lerp(wheel.transform.position, position, 0.1f);
         //wheel.transform.rotation = rotation;
-        wh.position = position;
-        wh.rotation = rotation * Quaternion.Euler(Vector3.back * 90);;
+        wheelMesh.position = position;
+        wheelMesh.rotation = rotation; //* Quaternion.Euler(Vector3.back * 90);;
     }
 }

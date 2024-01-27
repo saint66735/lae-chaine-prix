@@ -15,6 +15,7 @@ public class GameNetworkManager : NetworkBehaviour {
   public static GameNetworkManager instance;
   public List<NetworkObject> playerInstances;
   public GameObject chain;
+  public List<Transform> spawnPoints;
 
   private Action<NetworkManager.ConnectionApprovalRequest, NetworkManager.ConnectionApprovalResponse> defaultAprovalCallback;
   void Start() {

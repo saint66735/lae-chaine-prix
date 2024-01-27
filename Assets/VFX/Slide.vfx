@@ -138,12 +138,8 @@ MonoBehaviour:
   m_Label: Spawn system
   m_Data: {fileID: 8926484042661614702}
   m_InputFlowSlot:
-  - link:
-    - context: {fileID: 8926484042661615000}
-      slotIndex: 0
-  - link:
-    - context: {fileID: 8926484042661615004}
-      slotIndex: 0
+  - link: []
+  - link: []
   m_OutputFlowSlot:
   - link:
     - context: {fileID: 8926484042661614707}
@@ -3892,9 +3888,7 @@ MonoBehaviour:
   m_InputFlowSlot:
   - link: []
   m_OutputFlowSlot:
-  - link:
-    - context: {fileID: 8926484042661614700}
-      slotIndex: 0
+  - link: []
   eventName: OnStartDrift
 --- !u!114 &8926484042661615001
 MonoBehaviour:
@@ -3942,9 +3936,7 @@ MonoBehaviour:
   m_InputFlowSlot:
   - link: []
   m_OutputFlowSlot:
-  - link:
-    - context: {fileID: 8926484042661614700}
-      slotIndex: 1
+  - link: []
   eventName: OnStopDrift
 --- !u!114 &8926484042661615005
 MonoBehaviour:

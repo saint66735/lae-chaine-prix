@@ -3,12 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.VFX;
 using Random = UnityEngine.Random;
 
 public class PlayerScript : NetworkBehaviour
 {
     public NetworkVariable<Vector3> Position = new NetworkVariable<Vector3>();
     public bool loaded = false;
+    public VisualEffect exhaustEffect;
 
     private float horizontalInput;
     private float verticalInput;
@@ -38,6 +40,7 @@ public class PlayerScript : NetworkBehaviour
         if (IsOwner)
         {
             Move();
+            
         }
 
         loaded = true;
@@ -47,7 +50,7 @@ public class PlayerScript : NetworkBehaviour
     {
         if (NetworkManager.Singleton.IsServer)
         {
-            var randomPosition = GetRandomPositionOnPlane();
+            var randomPosition = GetNextPositionOnPlane();
             transform.position = randomPosition;
             Position.Value = randomPosition;
         }
@@ -61,13 +64,12 @@ public class PlayerScript : NetworkBehaviour
     [ServerRpc]
     void SubmitPositionRequestServerRpc(ServerRpcParams rpcParams = default)
     {
-        Position.Value = GetRandomPositionOnPlane();
+        Position.Value = GetNextPositionOnPlane();
         transform.position = Position.Value;
     }
 
-    static Vector3 GetRandomPositionOnPlane()
-    {
-        return new Vector3(Random.Range(-3f, 3f), 2f, Random.Range(-3f, 3f));
+    Vector3 GetNextPositionOnPlane() {
+        return GameNetworkManager.instance.spawnPoints[NetworkManager.Singleton.ConnectedClients.Count-1].position;
     }
 
     void Update() {
@@ -99,6 +101,7 @@ public class PlayerScript : NetworkBehaviour
         // Use that to calculate how much torque is available 
         // (zero torque at top speed)
         float currentMotorTorque = Mathf.Lerp(motorTorque, 0, speedFactor);
+        exhaustEffect.SetFloat("Exhaust", 10+verticalInput * 200);
         
         
         movedirection = new Vector3(horizontalInput, 0, verticalInput);
@@ -107,10 +110,10 @@ public class PlayerScript : NetworkBehaviour
 
         foreach (var wheel in wheels) {
             
-            wheel.collider.motorTorque = verticalInput * currentMotorTorque;
+            wheel.wheelCollider.motorTorque = verticalInput * currentMotorTorque;
             if (wheel.turningAllowed)
             {
-                wheel.collider.steerAngle = horizontalInput * currentSteerRange;
+                wheel.wheelCollider.steerAngle = horizontalInput * currentSteerRange;
             }
             
             if (isAccelerating)
@@ -118,16 +121,16 @@ public class PlayerScript : NetworkBehaviour
                 // Apply torque to Wheel colliders that have "Motorized" enabled
                 if (wheel.acceleratingAllowed)
                 {
-                    wheel.collider.motorTorque = verticalInput * currentMotorTorque;
+                    wheel.wheelCollider.motorTorque = verticalInput * currentMotorTorque;
                 }
-                wheel.collider.brakeTorque = 0;
+                wheel.wheelCollider.brakeTorque = 0;
             }
             else
             {
                 // If the user is trying to go in the opposite direction
                 // apply brakes to all wheels
-                wheel.collider.brakeTorque = Mathf.Abs(verticalInput) * brakeTorque;
-                wheel.collider.motorTorque = 0;
+                wheel.wheelCollider.brakeTorque = Mathf.Abs(verticalInput) * brakeTorque;
+                wheel.wheelCollider.motorTorque = 0;
             }
 
         }
