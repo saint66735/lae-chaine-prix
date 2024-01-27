@@ -13,7 +13,8 @@ public class PlayerScript : NetworkBehaviour
     public VisualEffect exhaustEffect;
 
     private float horizontalInput;
-    private float verticalInput;
+    [HideInInspector]
+    public float verticalInput;
     private Vector3 movedirection;
     //NetworkVariable<WheelScript[]> wheels = new NetworkVariable<WheelScript[]>();
     private WheelScript[] wheels;
@@ -26,6 +27,11 @@ public class PlayerScript : NetworkBehaviour
     public float steeringRange = 30;
     public float steeringRangeAtMaxSpeed = 15;
     public float centreOfGravityOffset = -1f;
+
+    [HideInInspector]
+    public float currentSpeed = 0f;
+    [HideInInspector]
+    public float currentSpeedFactor = 0f;
     
     void Start() {
         wheels = GetComponentsInChildren<WheelScript>();
@@ -87,7 +93,7 @@ public class PlayerScript : NetworkBehaviour
         ControlCarServerRpc(new UserInputStruct(horizontalInput, verticalInput, handbrakeInput));
         //transform.Translate();
     }
-    
+
     struct UserInputStruct : INetworkSerializeByMemcpy {
         public float horizontalInput;
         public float verticalInput;
@@ -103,23 +109,23 @@ public class PlayerScript : NetworkBehaviour
 
     [ServerRpc]
     void ControlCarServerRpc(UserInputStruct t, ServerRpcParams rpcParams = default) {
-        float forwardSpeed = Vector3.Dot(transform.forward, rigidBody.velocity);
+        currentSpeed = Vector3.Dot(transform.forward, rigidBody.velocity);
 
-
+        
         // Calculate how close the car is to top speed
         // as a number from zero to one
-        float speedFactor = Mathf.InverseLerp(0, maxSpeed, forwardSpeed);
+        currentSpeedFactor = Mathf.InverseLerp(0, maxSpeed, currentSpeed);
 
         // Use that to calculate how much torque is available 
         // (zero torque at top speed)
-        float currentMotorTorque = Mathf.Lerp(motorTorque, 0, speedFactor);
+        float currentMotorTorque = Mathf.Lerp(motorTorque, 0, currentSpeedFactor);
         exhaustEffect.SetFloat("Exhaust", 10+t.verticalInput * 200);
         
         
         movedirection = new Vector3(t.horizontalInput, 0, t.verticalInput);
-        float currentSteerRange = Mathf.Lerp(steeringRange, steeringRangeAtMaxSpeed, speedFactor);
-        bool isAccelerating = Mathf.Sign(t.verticalInput) == Mathf.Sign(forwardSpeed);
-        Debug.Log(t.handbrakeInput);
+        float currentSteerRange = Mathf.Lerp(steeringRange, steeringRangeAtMaxSpeed, currentSpeedFactor);
+        bool isAccelerating = Mathf.Sign(t.verticalInput) == Mathf.Sign(currentSpeed);
+        //Debug.Log(t.handbrakeInput);
         foreach (var wheel in wheels) {
             if (wheel.acceleratingAllowed) {
                 wheel.wheelCollider.motorTorque = t.verticalInput * currentMotorTorque;
@@ -149,22 +155,13 @@ public class PlayerScript : NetworkBehaviour
 
             if (t.handbrakeInput && wheel.acceleratingAllowed) {
                 wheel.wheelCollider.brakeTorque = brakeTorque;
-                wheel.wheelCollider.motorTorque = 0;
+                wheel.wheelCollider.motorTorque = Mathf.Lerp(wheel.wheelCollider.motorTorque, 0, 2f*Time.deltaTime);
             }
             else {
                 wheel.wheelCollider.brakeTorque = 0;
             }
 
-            WheelHit hit = new WheelHit();
-            if (wheel.wheelCollider.GetGroundHit(out hit)) {
-                //wheel.driftEffect.
-                if (hit.sidewaysSlip > .3 || hit.sidewaysSlip < -.3) {
-                    wheel.driftEffect.SendEvent("OnStartDrift");
-                }
-                else {
-                    wheel.driftEffect.SendEvent("OnStopDrift");
-                }
-            }
+            
         }
     }
 }

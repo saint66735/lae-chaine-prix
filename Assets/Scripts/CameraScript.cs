@@ -20,7 +20,7 @@ public class CameraScript : MonoBehaviour {
             var distanceMulti = 5 + carspeed*0.01f;
             //var positionTarget = playerTransform.position + playerTransform.forward * -10 + playerTransform.up * 5;
             var positionTarget = playerTransform.position + new Vector3(0,0,playerTransform.forward.z * -1.5f * distanceMulti) + Vector3.up * distanceMulti;
-            Debug.Log(positionTarget);
+            //Debug.Log(positionTarget);
             transform.position = Vector3.Lerp(transform.position, positionTarget, Mathf.Clamp(cameraRotateSpeed*(1+carspeed*0.01f),0,0.9f)*Time.deltaTime);//new Vector3(playerTransform.position.x, playerTransform.position.y+4, playerTransform.position.z-6);
             //var lookAt = (playerTransform.position - transform.position).normalized;
             //Quaternion toRotation = Quaternion.FromToRotation(transform.forward, lookAt);
