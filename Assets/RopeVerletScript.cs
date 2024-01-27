@@ -163,7 +163,8 @@ public class RopeVerletScript : MonoBehaviour
     private void applyForceConnectedRigidBodies() {
         var chainStart = linePositions[1];
         var chainEnd = linePositions[^1];
-        var forceMagnitude = Math.Clamp(AverageNodeLength() - nodeDistance,0,20) * 100f;
+        var forceMagnitude = Math.Clamp(AverageNodeLength() / nodeDistance,0,999) * 100000f * Time.deltaTime;
+        Debug.Log(forceMagnitude);
         //var dir = (transform.TransformPoint(chainStart) - startAnchor.position).normalized;
         var dir = (chainStart - startAnchor.position).normalized;
         Debug.DrawLine(startAnchor.position, startAnchor.position+dir* forceMagnitude, new Color(0, 0, 1.0f));

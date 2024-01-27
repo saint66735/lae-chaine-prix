@@ -1,10 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.VFX;
 using Random = UnityEngine.Random;
+using UnityEditor;
 
 public class PlayerScript : NetworkBehaviour
 {
@@ -32,6 +34,8 @@ public class PlayerScript : NetworkBehaviour
     public float currentSpeed = 0f;
     [HideInInspector]
     public float currentSpeedFactor = 0f;
+    
+    private float resetTimer = 0f;
     
     void Start() {
         wheels = GetComponentsInChildren<WheelScript>();
@@ -105,13 +109,13 @@ public class PlayerScript : NetworkBehaviour
             this.handbrakeInput = handbrakeInput;
         }
     }
-  
+
 
     [ServerRpc]
     void ControlCarServerRpc(UserInputStruct t, ServerRpcParams rpcParams = default) {
         currentSpeed = Vector3.Dot(transform.forward, rigidBody.velocity);
 
-        
+
         // Calculate how close the car is to top speed
         // as a number from zero to one
         currentSpeedFactor = Mathf.InverseLerp(0, maxSpeed, currentSpeed);
@@ -119,20 +123,20 @@ public class PlayerScript : NetworkBehaviour
         // Use that to calculate how much torque is available 
         // (zero torque at top speed)
         float currentMotorTorque = Mathf.Lerp(motorTorque, 0, currentSpeedFactor);
-        exhaustEffect.SetFloat("Exhaust", 10+t.verticalInput * 200);
-        
-        
+        exhaustEffect.SetFloat("Exhaust", 10 + t.verticalInput * 200);
+
+
         movedirection = new Vector3(t.horizontalInput, 0, t.verticalInput);
         float currentSteerRange = Mathf.Lerp(steeringRange, steeringRangeAtMaxSpeed, currentSpeedFactor);
         bool isAccelerating = Mathf.Sign(t.verticalInput) == Mathf.Sign(currentSpeed);
         //Debug.Log(t.handbrakeInput);
         foreach (var wheel in wheels) {
+
             if (wheel.acceleratingAllowed) {
                 wheel.wheelCollider.motorTorque = t.verticalInput * currentMotorTorque;
             }
 
-            if (wheel.turningAllowed)
-            {
+            if (wheel.turningAllowed) {
                 wheel.wheelCollider.steerAngle = t.horizontalInput * currentSteerRange;
             }
             /*
@@ -155,13 +159,45 @@ public class PlayerScript : NetworkBehaviour
 
             if (t.handbrakeInput && wheel.acceleratingAllowed) {
                 wheel.wheelCollider.brakeTorque = brakeTorque;
-                wheel.wheelCollider.motorTorque = Mathf.Lerp(wheel.wheelCollider.motorTorque, 0, 2f*Time.deltaTime);
+                WheelFrictionCurve fFriction = wheel.wheelCollider.sidewaysFriction;
+                fFriction.stiffness = 1f;
+                fFriction.asymptoteSlip = 0.8f;
+                wheel.wheelCollider.sidewaysFriction = fFriction;
+                //wheel.wheelCollider.motorTorque = Mathf.Lerp(wheel.wheelCollider.motorTorque, 0, 2f*Time.deltaTime);
             }
             else {
                 wheel.wheelCollider.brakeTorque = 0;
+                wheel.wheelCollider.sidewaysFriction = wheel.defaultSettings;
             }
 
-            
+            if (t.verticalInput == 0) wheel.wheelCollider.brakeTorque = 200;
+
+
         }
+        handleReset();
     }
+
+    void handleReset() {
+        if (wheels.Where(x => x.onGround).Count() <= 1) {
+            resetTimer += Time.deltaTime;
+        }
+        else resetTimer = 0f;
+
+        if (resetTimer >= 5f) {
+            resetTimer = 0f;
+            //ResetCar();
+        }
+        
+        if (Input.GetButton("Fire1")) ResetCar();
+    }
+    
+
+    void ResetCar() {
+        Camera.main.transform.position = Position.Value;
+        transform.position = Position.Value;
+        transform.rotation = Quaternion.identity;
+        rigidBody.velocity = Vector3.zero;
+    }
+    
 }
+

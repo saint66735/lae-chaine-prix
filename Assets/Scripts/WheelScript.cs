@@ -16,6 +16,9 @@ public class WheelScript : MonoBehaviour {
     private Rigidbody carRB;
 
     private int lastSkid = -1;
+
+    public WheelFrictionCurve defaultSettings;
+    public bool onGround = true;
     
     // Start is called before the first frame update
     void Start()
@@ -24,6 +27,7 @@ public class WheelScript : MonoBehaviour {
         driftEffect = GetComponent<VisualEffect>();
         carRB = GetComponentInParent<Rigidbody>();
         skidmarksController = FindObjectsOfType<Skidmarks>()[0];
+        defaultSettings = wheelCollider.sidewaysFriction;
     }
 
     // Update is called once per frame
@@ -53,8 +57,13 @@ public class WheelScript : MonoBehaviour {
                 driftEffect.SendEvent("OnStopDrift");
                 lastSkid = -1;
             }
+
+            onGround = true;
         }
-        else lastSkid = -1;
+        else {
+            lastSkid = -1;
+            onGround = false;
+        }
 
     }
 }

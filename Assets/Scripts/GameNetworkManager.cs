@@ -58,8 +58,8 @@ public class GameNetworkManager : NetworkBehaviour {
   private void ConnectionApprovalCallback(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
   {
     Debug.Log("conection aproved");
-    defaultAprovalCallback.Invoke(request,response);
-    playerInstances.Append(NetworkManager.Singleton.ConnectedClients[request.ClientNetworkId].PlayerObject);
+    if (defaultAprovalCallback!=null) defaultAprovalCallback.Invoke(request,response);
+    //playerInstances.Append(NetworkManager.Singleton.ConnectedClients[request.ClientNetworkId].PlayerObject);
     //foreach (var client in NetworkManager.Singleton.ConnectedClients.AsReadOnlyList()){
     //  client.Value.PlayerObject
     //}
@@ -88,6 +88,16 @@ public class GameNetworkManager : NetworkBehaviour {
     var chainScript = chain.GetComponent<RopeVerletScript>();
     chainScript.startAnchor = playerA.transform;
     chainScript.endAnchor = playerB.transform;
+    
+    var hingeA = playerA.gameObject.GetComponent<SpringJoint>();//chain.AddComponent<ConfigurableJoint>();
+    hingeA.connectedBody = playerB.GetComponent<Rigidbody>();
+    hingeA.spring = 80f;
+    hingeA.damper = 0;
+    var hingeB = playerB.gameObject.GetComponent<SpringJoint>();//chain.AddComponent<ConfigurableJoint>();
+    hingeB.connectedBody = playerA.gameObject.GetComponent<Rigidbody>();
+    hingeB.spring = 80f;
+    hingeB.damper = 0;
+
     //hingeA.linearLimitSpring.
   }
   // Update is called once per frame
