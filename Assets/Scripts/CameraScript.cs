@@ -17,7 +17,7 @@ public class CameraScript : MonoBehaviour {
             Transform playerTransform = GameNetworkManager.instance.NetworkManager.LocalClient.PlayerObject.transform;//GameNetworkManager.instance.playerClientInstance.transform;
             //GameNetworkManager.instance.NetworkManager.
             var carspeed = playerTransform.GetComponent<Rigidbody>().velocity.magnitude;
-            var distanceMulti = 3 + carspeed*0.5f;
+            var distanceMulti = 4 + carspeed*0.3f;
             //var positionTarget = playerTransform.position + playerTransform.forward * -10 + playerTransform.up * 5;
             var positionTarget = playerTransform.position + playerTransform.forward * -1.5f * distanceMulti + playerTransform.up * distanceMulti;
             
