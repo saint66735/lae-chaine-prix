@@ -85,6 +85,8 @@ public class PlayerScript : NetworkBehaviour
         //transform.Translate();
     }
 
+  
+
     [ServerRpc]
     void ControlCarServerRpc(float horizontalInput, float verticalInput, ServerRpcParams rpcParams = default) {
         float forwardSpeed = Vector3.Dot(transform.forward, rigidBody.velocity);
@@ -127,7 +129,7 @@ public class PlayerScript : NetworkBehaviour
                 wheel.collider.brakeTorque = Mathf.Abs(verticalInput) * brakeTorque;
                 wheel.collider.motorTorque = 0;
             }
-            Debug.Log(wheel.collider.motorTorque);
+
         }
     }
 }
