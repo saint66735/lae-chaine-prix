@@ -16,7 +16,7 @@ public class speedVolumeTest : MonoBehaviour
     void Update()
     {
         float velocity = Mathf.Abs(rigidbody.velocity.x) + Mathf.Abs(rigidbody.velocity.y) + Mathf.Abs(rigidbody.velocity.z);
-        Debug.Log(velocity);
+        //Debug.Log(velocity);
         windSound.volume = velocity / 60 ;
     }
 }
