@@ -156,12 +156,16 @@ public class GameNetworkManager : NetworkBehaviour {
     }
     */
     
+    if (playerInstances.Count >= 2) {
+      if(chain == null)SpawnChain(playerInstances[0], playerInstances[1]);
+      if(!raceStarted.Value) StartRace();
+    }
     if (otherPlayerObjects.Count >= 2 && chain == null) {
       SpawnVisualChain(otherPlayerObjects[0], otherPlayerObjects[1]);
     }
-    if (playerInstances.Count >= 2 && chain == null) {
-      SpawnChain(playerInstances[0], playerInstances[1]);
-    }
+    
+
+    
 
     if (IsClient && playerClientInstance == null && NetworkManager.LocalClient.PlayerObject!=null) {
       playerClientInstance = NetworkManager.Singleton.LocalClient.PlayerObject.gameObject;
