@@ -6,10 +6,11 @@ using Unity.Multiplayer.Playmode;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class GameNetworkManager : NetworkBehaviour {
   // Start is called before the first frame update
-  public GameObject playerPrefab;
+  public List<GameObject> playerPrefabs;
   public GameObject chainPrefab;
   public GameObject playerClientInstance;
   public static GameNetworkManager instance;
@@ -59,16 +60,27 @@ public class GameNetworkManager : NetworkBehaviour {
     else SubmitSpawnRequestServerRpc();
     */
     if (IsServer) {
-      defaultAprovalCallback = NetworkManager.ConnectionApprovalCallback;
-      NetworkManager.ConnectionApprovalCallback = ConnectionApprovalCallback;
+      defaultAprovalCallback = NetworkManager.Singleton.ConnectionApprovalCallback;
+      NetworkManager.Singleton.ConnectionApprovalCallback = ConnectionApprovalCallback;
     }
+
+    if (IsClient) {
+      SpawnServerRpc(NetworkManager.LocalClient.ClientId);
+    }
+  }
+  [ServerRpc(RequireOwnership = false)]
+  void SpawnServerRpc(ulong id, ServerRpcParams rpcParams = default) {
+    var playerPrefab = playerPrefabs[Random.Range(0, playerPrefabs.Count)];
+    GameObject go = (GameObject)Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
+    go.GetComponent<NetworkObject>().SpawnAsPlayerObject(id, true);
   }
   private void ConnectionApprovalCallback(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
   {
     Debug.Log("conection aproved");
-    GameObject go = (GameObject)Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
-    go.GetComponent<NetworkObject>().SpawnAsPlayerObject(request.ClientNetworkId, true);
+    
+    
     if (defaultAprovalCallback!=null) defaultAprovalCallback.Invoke(request,response);
+    
     //playerInstances.Append(NetworkManager.Singleton.ConnectedClients[request.ClientNetworkId].PlayerObject);
     //foreach (var client in NetworkManager.Singleton.ConnectedClients.AsReadOnlyList()){
     //  client.Value.PlayerObject

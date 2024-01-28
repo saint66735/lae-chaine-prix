@@ -32,7 +32,7 @@ public class audioTest : NetworkBehaviour
 
     void OnCollisionEnter(Collision collision) {
         if (collision.gameObject.CompareTag("Player")) {
-            collisionSound.PlayOneShot(collisionClips[Random.Range(0,collisionClips.Count-1)]);
+            collisionSound.PlayOneShot(collisionClips[Random.Range(0,collisionClips.Count)]);
         }
     }
 
