@@ -89,7 +89,9 @@ public class GameNetworkManager : NetworkBehaviour {
   
   [ClientRpc]
   void WinClientRpc(ulong winnerID) {
-    var txt = winnerID == NetworkManager.LocalClientId ? "You won!" : "You lost!";
+    Debug.Log(winnerID);
+    Debug.Log(NetworkManager.LocalClientId);
+    var txt = winnerID == NetworkManager.LocalClientId;
     UIManagerScript.ShowWinner(txt);
   }
 
@@ -101,6 +103,15 @@ public class GameNetworkManager : NetworkBehaviour {
   [ClientRpc]
   void StartClientRpc() {
     UIManagerScript.timeLeft = 6f;
+  }
+  
+  [ServerRpc(RequireOwnership = true)]
+  void CloseServerRpc(ServerRpcParams rpcParams = default) {
+    NetworkManager.DisconnectClient(rpcParams.Receive.SenderClientId);
+  }
+
+  public void Close() {
+    CloseServerRpc();
   }
 
   [ServerRpc(RequireOwnership = false)]

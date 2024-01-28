@@ -15,6 +15,8 @@ public class UI_Manager : MonoBehaviour
     public TextMeshProUGUI ipInput;
     public TextMeshProUGUI portInput;
     public Image countdown;
+    public Image Losing;
+    public Image Winning;
     UnityTransport transport;
     public float timeLeft = 0;
 
@@ -64,8 +66,9 @@ public class UI_Manager : MonoBehaviour
     }
     public void OnQuit()
     {
-        //Application.Quit();
-        GameNetworkManager.instance.NetworkManager.Shutdown();
+        //GameNetworkManager.instance.NetworkManager.Shutdown();
+        GameNetworkManager.instance.Close();
+        Application.Quit();
         Debug.Log("I WANNA QUIT");
     }
     public void closePanels()
@@ -96,8 +99,8 @@ public class UI_Manager : MonoBehaviour
         closePanels();
     }
 
-    public void ShowWinner(string txt) {
-        
+    public void ShowWinner(bool won) {
+        if (won) Winning.enabled = true; else Losing.enabled = true;
     }
 
     public void ShowTimeLeft() {
