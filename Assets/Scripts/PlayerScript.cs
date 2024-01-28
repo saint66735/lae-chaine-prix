@@ -90,7 +90,7 @@ public class PlayerScript : NetworkBehaviour
         //    float theta = Time.frameCount / 10.0f + NetworkObject.NetworkObjectId;
         //    transform.position = new Vector3((float) Math.Cos(theta), 0.0f, (float) Math.Sin(theta));
         //}
-        if (!GameNetworkManager.instance.isFreeroam) {
+        if (!GameNetworkManager.instance.isFreeroam && GameNetworkManager.instance.raceTime > 6f) {
             horizontalInput = Input.GetAxis("Horizontal");
             verticalInput = Input.GetAxis("Vertical");
             var handbrakeInput = Input.GetButton("Jump");

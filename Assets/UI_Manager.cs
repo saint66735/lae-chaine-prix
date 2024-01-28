@@ -14,10 +14,15 @@ public class UI_Manager : MonoBehaviour
     public GameObject additionalPanel;
     public TextMeshProUGUI ipInput;
     public TextMeshProUGUI portInput;
+    public Image countdown;
     UnityTransport transport;
+    public float timeLeft = 0;
+
+    public List<Sprite> countdownImages;
     // Start is called before the first frame update
     void Start() {
         loadDefaults();
+        //countdown.enabled = false;
     }
 
     public void loadDefaults() {
@@ -55,6 +60,7 @@ public class UI_Manager : MonoBehaviour
             Camera.main.GetComponent<FreeCamera>().enabled = GameNetworkManager.instance.isFreeroam;
             Camera.main.GetComponent<CameraScript>().enabled = !GameNetworkManager.instance.isFreeroam;
         }
+        if(GameNetworkManager.instance.raceStarted.Value)ShowTimeLeft();
     }
     public void OnQuit()
     {
@@ -67,6 +73,7 @@ public class UI_Manager : MonoBehaviour
         mainPanel.SetActive(false);
         additionalPanel.SetActive(false);
         Cursor.visible = false;
+        countdown.enabled = true;
     }
     void updateAddress()
     {
@@ -80,11 +87,26 @@ public class UI_Manager : MonoBehaviour
         //updateAddress();
         GameNetworkManager.instance.NetworkManager.StartHost();
         closePanels();
+        
     }
     public void OnJoin()
     {
         //updateAddress();
         GameNetworkManager.instance.NetworkManager.StartClient();
         closePanels();
+    }
+
+    public void ShowWinner(string txt) {
+        
+    }
+
+    public void ShowTimeLeft() {
+        timeLeft -= Time.deltaTime;
+        if (timeLeft > 0) {
+            countdown.enabled = true;
+            countdown.sprite = countdownImages[(int)Mathf.Floor(timeLeft/2)];
+        }
+        else countdown.enabled = false;
+
     }
 }  

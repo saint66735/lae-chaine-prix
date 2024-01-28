@@ -21,6 +21,8 @@ public class GameNetworkManager : NetworkBehaviour {
   public GameObject chain;
   public List<Transform> spawnPoints;
   public UI_Manager UIManagerScript;
+  public float raceTime = 0;
+  public NetworkVariable<bool> raceStarted = new NetworkVariable<bool>(false);
   public bool isFreeroam = false;
 
   private Action<NetworkManager.ConnectionApprovalRequest, NetworkManager.ConnectionApprovalResponse> defaultAprovalCallback;
@@ -36,14 +38,14 @@ public class GameNetworkManager : NetworkBehaviour {
       networkManager.StartServer();
     }
     else if (mppmTag.Contains("Host")) {
-      //UIManagerScript.OnHost();
-      networkManager.StartHost();
-      UIManagerScript.closePanels();
+      UIManagerScript.OnHost();
+      //networkManager.StartHost();
+      //UIManagerScript.closePanels();
     }
     else if (mppmTag.Contains("Client")) {
-      //UIManagerScript.OnJoin();
-      networkManager.StartClient();
-      UIManagerScript.closePanels();
+      UIManagerScript.OnJoin();
+      //networkManager.StartClient();
+      //UIManagerScript.closePanels();
     }
     
   }
@@ -78,6 +80,29 @@ public class GameNetworkManager : NetworkBehaviour {
       
     }
   }
+
+  public void RaceWin(ulong winnerID) {
+    //NetworkManager.ConnectedClients[winnerID]
+    WinClientRpc(winnerID);
+  }
+  
+  
+  [ClientRpc]
+  void WinClientRpc(ulong winnerID) {
+    var txt = winnerID == NetworkManager.LocalClientId ? "You won!" : "You lost!";
+    UIManagerScript.ShowWinner(txt);
+  }
+
+  void StartRace() {
+    raceStarted.Value = true;
+    
+    StartClientRpc();
+  }
+  [ClientRpc]
+  void StartClientRpc() {
+    UIManagerScript.timeLeft = 6f;
+  }
+
   [ServerRpc(RequireOwnership = false)]
   void SpawnServerRpc(ulong id, ServerRpcParams rpcParams = default) {
     var playerPrefab = playerPrefabs[Random.Range(0, playerPrefabs.Count)];
@@ -166,9 +191,11 @@ public class GameNetworkManager : NetworkBehaviour {
     
 
     
+    if (raceStarted.Value == true) raceTime += Time.deltaTime;
 
     if (IsClient && playerClientInstance == null && NetworkManager.LocalClient.PlayerObject!=null) {
       playerClientInstance = NetworkManager.Singleton.LocalClient.PlayerObject.gameObject;
     }
   }
+  
 }
