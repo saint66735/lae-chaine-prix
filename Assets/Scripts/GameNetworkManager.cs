@@ -6,6 +6,7 @@ using Unity.Multiplayer.Playmode;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering;
 using Random = UnityEngine.Random;
 
 public class GameNetworkManager : NetworkBehaviour {
@@ -19,6 +20,7 @@ public class GameNetworkManager : NetworkBehaviour {
   public GameObject chain;
   public List<Transform> spawnPoints;
   public UI_Manager UIManagerScript;
+  public bool isFreeroam = false;
 
   private Action<NetworkManager.ConnectionApprovalRequest, NetworkManager.ConnectionApprovalResponse> defaultAprovalCallback;
   void Start() {
@@ -63,9 +65,21 @@ public class GameNetworkManager : NetworkBehaviour {
       defaultAprovalCallback = NetworkManager.Singleton.ConnectionApprovalCallback;
       NetworkManager.Singleton.ConnectionApprovalCallback = ConnectionApprovalCallback;
     }
-
+    if (isFreeroam) {
+      Camera.main.GetComponent<FreeCamera>().enabled = true;
+      Camera.main.GetComponent<CameraScript>().enabled = false;
+      Debug.Log(Camera.main.GetComponent<FreeCamera>().enabled);
+    }
     if (IsClient) {
-      SpawnServerRpc(NetworkManager.LocalClient.ClientId);
+      if (isFreeroam) {
+        Camera.main.GetComponent<FreeCamera>().enabled = true;
+        Camera.main.GetComponent<CameraScript>().enabled = false;
+      }
+      else {
+        SpawnServerRpc(NetworkManager.LocalClient.ClientId);
+      }
+
+      
     }
   }
   [ServerRpc(RequireOwnership = false)]

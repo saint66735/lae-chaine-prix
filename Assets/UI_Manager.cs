@@ -40,6 +40,15 @@ public class UI_Manager : MonoBehaviour
                 Cursor.visible = true;
             }
         }
+
+        if (Input.GetKeyDown(KeyCode.P)) {
+            GameNetworkManager.instance.isFreeroam = true;
+            OnJoin();
+        }
+        if (Input.GetKeyDown(KeyCode.L)) {
+            GameNetworkManager.instance.isFreeroam = true;
+            OnHost();
+        }
     }
     public void OnQuit()
     {
@@ -62,13 +71,13 @@ public class UI_Manager : MonoBehaviour
     }
     public void OnHost()
     {
-        updateAddress();
+        //updateAddress();
         GameNetworkManager.instance.NetworkManager.StartHost();
         closePanels();
     }
     public void OnJoin()
     {
-        updateAddress();
+        //updateAddress();
         GameNetworkManager.instance.NetworkManager.StartClient();
         closePanels();
     }

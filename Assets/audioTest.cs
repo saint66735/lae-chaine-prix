@@ -27,7 +27,9 @@ public class audioTest : NetworkBehaviour
     }
 
     public override void OnNetworkSpawn() {
-        pitch.Value = defaultPitch;
+        if (IsServer) {
+            pitch.Value = defaultPitch;
+        }
     }
 
     void OnCollisionEnter(Collision collision) {
