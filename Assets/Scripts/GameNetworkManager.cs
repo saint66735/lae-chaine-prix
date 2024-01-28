@@ -16,7 +16,8 @@ public class GameNetworkManager : NetworkBehaviour {
   public GameObject playerClientInstance;
   public static GameNetworkManager instance;
   //public List<NetworkObject> playerInstances;
-  public List<GameObject> playerInstances;
+  public List<GameObject> otherPlayerObjects;
+  public List<NetworkObject> playerInstances;
   public GameObject chain;
   public List<Transform> spawnPoints;
   public UI_Manager UIManagerScript;
@@ -65,11 +66,6 @@ public class GameNetworkManager : NetworkBehaviour {
       defaultAprovalCallback = NetworkManager.Singleton.ConnectionApprovalCallback;
       NetworkManager.Singleton.ConnectionApprovalCallback = ConnectionApprovalCallback;
     }
-    if (isFreeroam) {
-      Camera.main.GetComponent<FreeCamera>().enabled = true;
-      Camera.main.GetComponent<CameraScript>().enabled = false;
-      Debug.Log(Camera.main.GetComponent<FreeCamera>().enabled);
-    }
     if (IsClient) {
       if (isFreeroam) {
         Camera.main.GetComponent<FreeCamera>().enabled = true;
@@ -114,16 +110,14 @@ public class GameNetworkManager : NetworkBehaviour {
   }
  */
 
-  void SpawnChain(GameObject playerA, GameObject playerB) {
-    chain = (GameObject)Instantiate(chainPrefab, Vector3.zero, Quaternion.identity);
+  void SpawnChain(NetworkObject playerA, NetworkObject playerB) {
+   
     //var hingeA = chain.GetComponents<ConfigurableJoint>()[0];//chain.AddComponent<ConfigurableJoint>();
     //var hingeB = chain.GetComponents<ConfigurableJoint>()[1];//chain.AddComponent<ConfigurableJoint>();
     //hingeA.connectedBody = playerA.gameObject.GetComponent<Rigidbody>();
     //hingeB.connectedBody = playerB.gameObject.GetComponent<Rigidbody>();
     //hingeA.connectedAnchor = playerA.transform.position;
-    var chainScript = chain.GetComponent<RopeVerletScript>();
-    chainScript.startAnchor = playerA.transform;
-    chainScript.endAnchor = playerB.transform;
+    
     
     var hingeA = playerA.gameObject.GetComponent<SpringJoint>();//chain.AddComponent<ConfigurableJoint>();
     hingeA.connectedBody = playerB.GetComponent<Rigidbody>();
@@ -136,11 +130,23 @@ public class GameNetworkManager : NetworkBehaviour {
 
     //hingeA.linearLimitSpring.
   }
+
+  void SpawnVisualChain(GameObject playerA, GameObject playerB) {
+    chain = (GameObject)Instantiate(chainPrefab, Vector3.zero, Quaternion.identity);
+    var chainScript = chain.GetComponent<RopeVerletScript>();
+    chainScript.startAnchor = playerA.transform;
+    chainScript.endAnchor = playerB.transform;
+  }
   // Update is called once per frame
   void Update() {
     if (true || IsServer) {
-      var clientObjects = FindObjectsOfType<PlayerScript>().Select(x=>x.gameObject);
-      if (playerInstances == null || playerInstances.Count != clientObjects.Count()) playerInstances = new List<GameObject>(clientObjects);
+      var _otherPlayerObjects = FindObjectsOfType<PlayerScript>().Select(x=>x.gameObject);
+      if (otherPlayerObjects == null || _otherPlayerObjects.Count() != otherPlayerObjects.Count()) otherPlayerObjects = new List<GameObject>(_otherPlayerObjects);
+    }
+    if (IsServer) {
+      var _playerInstances = NetworkManager.Singleton.ConnectedClients
+        .Select(x => x.Value.PlayerObject).Where(x=>x!=null).AsReadOnlyList();
+      if (playerInstances == null || playerInstances.Count != _playerInstances.Count()) playerInstances = new List<NetworkObject>(_playerInstances);
     }
     //Debug.Log(playerInstances.Count);
     /*
@@ -150,6 +156,9 @@ public class GameNetworkManager : NetworkBehaviour {
     }
     */
     
+    if (otherPlayerObjects.Count >= 2 && chain == null) {
+      SpawnVisualChain(otherPlayerObjects[0], otherPlayerObjects[1]);
+    }
     if (playerInstances.Count >= 2 && chain == null) {
       SpawnChain(playerInstances[0], playerInstances[1]);
     }
