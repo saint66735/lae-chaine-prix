@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using TMPro;
 using Unity.Netcode.Transports.UTP;
 using Unity.VisualScripting;
+using UnityEngine.Rendering;
 
 public class UI_Manager : MonoBehaviour
 {
@@ -45,9 +46,14 @@ public class UI_Manager : MonoBehaviour
             GameNetworkManager.instance.isFreeroam = true;
             OnJoin();
         }
-        if (Input.GetKeyDown(KeyCode.L)) {
+        if (Input.GetKeyDown(KeyCode.O)) {
             GameNetworkManager.instance.isFreeroam = true;
             OnHost();
+        }
+        if (Input.GetKeyDown(KeyCode.L)) {
+            GameNetworkManager.instance.isFreeroam = !GameNetworkManager.instance.isFreeroam;
+            Camera.main.GetComponent<FreeCamera>().enabled = GameNetworkManager.instance.isFreeroam;
+            Camera.main.GetComponent<CameraScript>().enabled = !GameNetworkManager.instance.isFreeroam;
         }
     }
     public void OnQuit()

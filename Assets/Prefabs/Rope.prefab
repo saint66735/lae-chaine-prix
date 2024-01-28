@@ -155,9 +155,9 @@ MonoBehaviour:
   linkMaterial: {fileID: 2100000, guid: 2076c2e21b0cdac4e82d389d83363325, type: 2}
   mouseOffset: 10
   nodeDistance: 0.35
-  nodeColliderRadius: 0
+  nodeColliderRadius: 0.2
   gravityStrength: 0.1
-  totalNodes: 30
+  totalNodes: 50
   velocityDampen: 0.95
   stiffness: 0.8
   iterateCollisionsEvery: 1
