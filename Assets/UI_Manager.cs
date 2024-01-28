@@ -12,8 +12,8 @@ public class UI_Manager : MonoBehaviour
 {
     public GameObject mainPanel;
     public GameObject additionalPanel;
-    public TextMeshProUGUI ipInput;
-    public TextMeshProUGUI portInput;
+    public TMP_InputField ipInput;
+    public TMP_InputField portInput;
     public Image countdown;
     public Image Losing;
     public Image Winning;
@@ -23,14 +23,14 @@ public class UI_Manager : MonoBehaviour
     public List<Sprite> countdownImages;
     // Start is called before the first frame update
     void Start() {
-        loadDefaults();
+        //loadDefaults();
         //countdown.enabled = false;
     }
 
     public void loadDefaults() {
         var tp = GameNetworkManager.instance.NetworkManager.GetComponent<UnityTransport>();
-        ipInput.SetText(tp.ConnectionData.Address);
-        portInput.SetText(Convert.ToString((int)tp.ConnectionData.Port));
+        //ipInput.SetText(tp.ConnectionData.Address);
+        //portInput.SetText(Convert.ToString((int)tp.ConnectionData.Port));
         //Debug.Log(tp.ConnectionData.Port);
     }
     private void Update()
@@ -82,8 +82,17 @@ public class UI_Manager : MonoBehaviour
     {
         transport = GameNetworkManager.instance.NetworkManager.GetComponent<UnityTransport>();
         transport.ConnectionData.Address = ipInput.text;
-        string temp = portInput.text.Substring(0, portInput.text.Length - 2);
-        transport.ConnectionData.Port = ushort.Parse(temp);
+        string temp = portInput.text.Substring(0, portInput.text.Length);
+        //Debug.Log(portInput.text);
+        try {
+            transport.ConnectionData.Port = ushort.Parse(temp);
+        }
+        catch {
+            Debug.Log("wrong port format");
+        }
+
+        Debug.Log(transport.ConnectionData.Port);
+        Debug.Log(transport.ConnectionData.Address);
     }
     public void OnHost()
     {
@@ -97,6 +106,10 @@ public class UI_Manager : MonoBehaviour
         //updateAddress();
         GameNetworkManager.instance.NetworkManager.StartClient();
         closePanels();
+    }
+
+    public void TextEdited() {
+        updateAddress();
     }
 
     public void ShowWinner(bool won) {

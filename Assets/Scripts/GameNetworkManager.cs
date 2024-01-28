@@ -117,7 +117,7 @@ public class GameNetworkManager : NetworkBehaviour {
   [ServerRpc(RequireOwnership = false)]
   void SpawnServerRpc(ulong id, ServerRpcParams rpcParams = default) {
     var playerPrefab = playerPrefabs[Random.Range(0, playerPrefabs.Count)];
-    GameObject go = (GameObject)Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
+    GameObject go = (GameObject)Instantiate(playerPrefab, Vector3.zero, Quaternion.Euler(Vector3.left));
     go.GetComponent<NetworkObject>().SpawnAsPlayerObject(id, true);
   }
   private void ConnectionApprovalCallback(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
