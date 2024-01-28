@@ -141,16 +141,18 @@ public class RopeVerletScript : MonoBehaviour
             endLock = cam.ScreenToWorldPoint(Input.mousePosition + new Vector3(0, 0, mouseOffset));
         }
         */
-        isStartLocked = true;
-        startLock = startAnchor.position;
-        endLock = endAnchor.position;
-        var middle = (startLock + endLock) / 2;
-        startLock = Vector3.Lerp(startLock, middle, 0.1f);
-        endLock = Vector3.Lerp(endLock, middle, 0.1f);
-        DrawRope();
+        if (startAnchor != null && endAnchor != null) {
+            isStartLocked = true;
+            startLock = startAnchor.position;
+            endLock = endAnchor.position;
+            var middle = (startLock + endLock) / 2;
+            startLock = Vector3.Lerp(startLock, middle, 0.1f);
+            endLock = Vector3.Lerp(endLock, middle, 0.1f);
+            DrawRope();
 
-        // Instanced drawing here is really performant over using GameObjects
-        Graphics.DrawMeshInstanced(link, 0, linkMaterial, matrices, totalNodes);
+            // Instanced drawing here is really performant over using GameObjects
+            Graphics.DrawMeshInstanced(link, 0, linkMaterial, matrices, totalNodes);
+        }
     }
 
     private float TotalNodeLength() {

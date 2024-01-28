@@ -94,8 +94,9 @@ public class PlayerScript : NetworkBehaviour
             horizontalInput = Input.GetAxis("Horizontal");
             verticalInput = Input.GetAxis("Vertical");
             var handbrakeInput = Input.GetButton("Jump");
+            var reset = Input.GetButton("Fire1");
             if (IsOwner && Application.isFocused)
-                ControlCarServerRpc(new UserInputStruct(horizontalInput, verticalInput, handbrakeInput));
+                ControlCarServerRpc(new UserInputStruct(horizontalInput, verticalInput, handbrakeInput,reset));
         }
         //transform.Translate();
     }
@@ -104,11 +105,14 @@ public class PlayerScript : NetworkBehaviour
         public float horizontalInput;
         public float verticalInput;
         public bool handbrakeInput;
+        public bool reset;
 
-        public UserInputStruct(float horizontalInput, float verticalInput, bool handbrakeInput) {
+
+        public UserInputStruct(float horizontalInput, float verticalInput, bool handbrakeInput, bool reset) {
             this.horizontalInput = horizontalInput;
             this.verticalInput = verticalInput;
             this.handbrakeInput = handbrakeInput;
+            this.reset = reset;
         }
     }
 
@@ -176,10 +180,10 @@ public class PlayerScript : NetworkBehaviour
 
 
         }
-        handleReset();
+        handleReset(t.reset);
     }
 
-    void handleReset() {
+    void handleReset(bool resetButton) {
         if (wheels.Where(x => x.onGround).Count() <= 1) {
             resetTimer += Time.deltaTime;
         }
@@ -190,7 +194,7 @@ public class PlayerScript : NetworkBehaviour
             //ResetCar();
         }
         
-        if (Input.GetButton("Fire1")) ResetCar();
+        if (resetButton) ResetCar();
     }
     
 
