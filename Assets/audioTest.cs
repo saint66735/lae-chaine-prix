@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -8,6 +9,7 @@ public class audioTest : NetworkBehaviour
 {
     public AudioSource audioSource;
     public AudioSource windSound;
+    public AudioSource driftSound;
     public float defaultPitch = 0.5f;
     public float pitchChange = 0.2f;
     public float maxPitch = 2.0f;
@@ -26,6 +28,10 @@ public class audioTest : NetworkBehaviour
     }
 
 // Update is called once per frame
+    public void handleDriftStart() {
+        driftSound.PlayOneShot(driftSound.clip);
+    }
+
     void Update() {
 
         audioSource.pitch = pitch.Value;
@@ -37,6 +43,8 @@ public class audioTest : NetworkBehaviour
             UpdatePitchServerRpc(targetPitch);
             
             windSound.volume = playerScript.currentSpeedFactor/4f;
+            if(playerScript.wheels.Where(x=>x.startedDrifting).Count()>0)driftSound.Play();//.PlayOneShot(driftSound.clip);
+            
         }
 
         /*

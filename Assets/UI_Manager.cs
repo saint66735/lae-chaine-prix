@@ -1,9 +1,12 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Unity.Netcode.Transports.UTP;
+using Unity.VisualScripting;
+
 public class UI_Manager : MonoBehaviour
 {
     public GameObject mainPanel;
@@ -12,10 +15,15 @@ public class UI_Manager : MonoBehaviour
     public TextMeshProUGUI portInput;
     UnityTransport transport;
     // Start is called before the first frame update
-    void Start()
-    {
-       
+    void Start() {
+        loadDefaults();
+    }
 
+    public void loadDefaults() {
+        var tp = GameNetworkManager.instance.NetworkManager.GetComponent<UnityTransport>();
+        ipInput.text = tp.ConnectionData.Address;
+        portInput.text = Convert.ToString((int)tp.ConnectionData.Port);
+        Debug.Log(tp.ConnectionData.Port);
     }
     private void Update()
     {
@@ -52,15 +60,15 @@ public class UI_Manager : MonoBehaviour
         string temp = portInput.text.Substring(0, portInput.text.Length - 2);
         transport.ConnectionData.Port = ushort.Parse(temp);
     }
-    public void OnHost()
+    public void OnHost(bool update=true)
     {
-        updateAddress();
+        if(update)updateAddress();
         GameNetworkManager.instance.NetworkManager.StartHost();
         closePanels();
     }
-    public void OnJoin()
+    public void OnJoin(bool update=true)
     {
-        updateAddress();
+        if(update)updateAddress();
         GameNetworkManager.instance.NetworkManager.StartClient();
         closePanels();
     }

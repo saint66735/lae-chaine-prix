@@ -16,10 +16,12 @@ public class GameNetworkManager : NetworkBehaviour {
   public List<NetworkObject> playerInstances;
   public GameObject chain;
   public List<Transform> spawnPoints;
+  public UI_Manager UIManagerScript;
 
   private Action<NetworkManager.ConnectionApprovalRequest, NetworkManager.ConnectionApprovalResponse> defaultAprovalCallback;
   void Start() {
     instance = this;
+    UIManagerScript.loadDefaults();
     var mppmTag = "";
     if (CurrentPlayer.ReadOnlyTags().Count>0)mppmTag = CurrentPlayer.ReadOnlyTags().First();
     Debug.Log(mppmTag);
@@ -29,10 +31,12 @@ public class GameNetworkManager : NetworkBehaviour {
       networkManager.StartServer();
     }
     else if (mppmTag.Contains("Host")) {
-      networkManager.StartHost();
+      UIManagerScript.OnHost(false);
+      //networkManager.StartHost();
     }
     else if (mppmTag.Contains("Client")) {
-      networkManager.StartClient();
+      UIManagerScript.OnJoin(false);
+      //networkManager.StartClient();
     }
     
   }

@@ -4,6 +4,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.VFX;
 
+public delegate void NotifyDrift();
 public class WheelScript : MonoBehaviour {
     public bool turningAllowed;
     public bool acceleratingAllowed;
@@ -16,9 +17,13 @@ public class WheelScript : MonoBehaviour {
     private Rigidbody carRB;
 
     private int lastSkid = -1;
+    public bool isDrifting = false;
+    public bool startedDrifting = false;
 
     public WheelFrictionCurve defaultSettings;
     public bool onGround = true;
+    
+    public event NotifyDrift ProcessCompleted;
     
     // Start is called before the first frame update
     void Start()
@@ -52,10 +57,15 @@ public class WheelScript : MonoBehaviour {
                 Vector3 skidPoint = hit.point + (carRB.velocity * Time.deltaTime);
                 lastSkid = skidmarksController.AddSkidMark(skidPoint, hit.normal, 0.4f+slip, lastSkid);
                 //Debug.Log(lastSkid);
+                if (!isDrifting) startedDrifting = true;
+                else startedDrifting = false;//ProcessCompleted?.Invoke(); 
+                isDrifting = true;
             }
             else {
                 driftEffect.SendEvent("OnStopDrift");
                 lastSkid = -1;
+                isDrifting = false;
+                startedDrifting = false;
             }
 
             onGround = true;

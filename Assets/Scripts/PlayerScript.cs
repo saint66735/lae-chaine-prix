@@ -19,7 +19,7 @@ public class PlayerScript : NetworkBehaviour
     public float verticalInput;
     private Vector3 movedirection;
     //NetworkVariable<WheelScript[]> wheels = new NetworkVariable<WheelScript[]>();
-    private WheelScript[] wheels;
+    public WheelScript[] wheels;
     private Rigidbody rigidBody;
     
     
