@@ -71,8 +71,8 @@ public class RopeVerletScript : MonoBehaviour
     Matrix4x4[] matrices;
 
     void Start() {
-        startRigid = startAnchor.gameObject.GetComponent<Rigidbody>();
-        endRigid = startAnchor.gameObject.GetComponent<Rigidbody>();
+        //startRigid = startAnchor.gameObject.GetComponent<Rigidbody>();
+        //endRigid = startAnchor.gameObject.GetComponent<Rigidbody>();
     }
 
     void Awake()
@@ -150,8 +150,14 @@ public class RopeVerletScript : MonoBehaviour
             endLock = Vector3.Lerp(endLock, middle, 0.1f);
             DrawRope();
 
-            // Instanced drawing here is really performant over using GameObjects
-            Graphics.DrawMeshInstanced(link, 0, linkMaterial, matrices, totalNodes);
+            try {
+                // Instanced drawing here is really performant over using GameObjects
+                Graphics.DrawMeshInstanced(link, 0, linkMaterial, matrices, totalNodes);
+            }
+            catch(Exception e) {
+                Debug.LogError(e.Message);
+                Awake();
+            }
         }
     }
 
