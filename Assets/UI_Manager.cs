@@ -42,10 +42,12 @@ public class UI_Manager : MonoBehaviour
     }
     public void OnHost()
     {
+        GameNetworkManager.instance.NetworkManager.StartHost();
         closePanels();
     }
     public void OnJoin()
     {
+        GameNetworkManager.instance.NetworkManager.StartClient();
         closePanels();
     }
 }  
