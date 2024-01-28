@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [RequireComponent(typeof(PlayerScript))]
@@ -10,6 +11,8 @@ public class audioTest : NetworkBehaviour
     public AudioSource audioSource;
     public AudioSource windSound;
     public AudioSource driftSound;
+    public AudioSource collisionSound;
+    public List<AudioClip> collisionClips;
     public float defaultPitch = 0.5f;
     public float pitchChange = 0.2f;
     public float maxPitch = 2.0f;
@@ -25,6 +28,12 @@ public class audioTest : NetworkBehaviour
 
     public override void OnNetworkSpawn() {
         pitch.Value = defaultPitch;
+    }
+
+    void OnCollisionEnter(Collision collision) {
+        if (collision.gameObject.CompareTag("Player")) {
+            collisionSound.PlayOneShot(collisionClips[Random.Range(0,collisionClips.Count-1)]);
+        }
     }
 
 // Update is called once per frame
