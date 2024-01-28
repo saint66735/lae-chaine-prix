@@ -20,7 +20,8 @@ public class GameNetworkManager : NetworkBehaviour {
   private Action<NetworkManager.ConnectionApprovalRequest, NetworkManager.ConnectionApprovalResponse> defaultAprovalCallback;
   void Start() {
     instance = this;
-    var mppmTag = CurrentPlayer.ReadOnlyTags().First();
+    var mppmTag = "";
+    if (CurrentPlayer.ReadOnlyTags().Count>0)mppmTag = CurrentPlayer.ReadOnlyTags().First();
     Debug.Log(mppmTag);
     var networkManager = NetworkManager.Singleton;
     
@@ -91,12 +92,12 @@ public class GameNetworkManager : NetworkBehaviour {
     
     var hingeA = playerA.gameObject.GetComponent<SpringJoint>();//chain.AddComponent<ConfigurableJoint>();
     hingeA.connectedBody = playerB.GetComponent<Rigidbody>();
-    hingeA.spring = 80f;
-    hingeA.damper = 0;
+    hingeA.spring = 150f;
+    hingeA.damper = 0.1f;
     var hingeB = playerB.gameObject.GetComponent<SpringJoint>();//chain.AddComponent<ConfigurableJoint>();
     hingeB.connectedBody = playerA.gameObject.GetComponent<Rigidbody>();
-    hingeB.spring = 80f;
-    hingeB.damper = 0;
+    hingeB.spring = 150f;
+    hingeB.damper = 0.1f;
 
     //hingeA.linearLimitSpring.
   }

@@ -31,6 +31,7 @@ public class UI_Manager : MonoBehaviour
     public void OnQuit()
     {
         //Application.Quit();
+        GameNetworkManager.instance.NetworkManager.Shutdown();
         Debug.Log("I WANNA QUIT");
     }
     void closePanels()

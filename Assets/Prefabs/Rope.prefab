@@ -157,7 +157,7 @@ MonoBehaviour:
   nodeDistance: 0.35
   nodeColliderRadius: 0
   gravityStrength: 0.1
-  totalNodes: 20
+  totalNodes: 30
   velocityDampen: 0.95
   stiffness: 0.8
   iterateCollisionsEvery: 1
