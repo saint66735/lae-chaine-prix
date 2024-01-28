@@ -21,9 +21,9 @@ public class UI_Manager : MonoBehaviour
 
     public void loadDefaults() {
         var tp = GameNetworkManager.instance.NetworkManager.GetComponent<UnityTransport>();
-        ipInput.text = tp.ConnectionData.Address;
-        portInput.text = Convert.ToString((int)tp.ConnectionData.Port);
-        Debug.Log(tp.ConnectionData.Port);
+        ipInput.SetText(tp.ConnectionData.Address);
+        portInput.SetText(Convert.ToString((int)tp.ConnectionData.Port));
+        //Debug.Log(tp.ConnectionData.Port);
     }
     private void Update()
     {
@@ -47,7 +47,7 @@ public class UI_Manager : MonoBehaviour
         GameNetworkManager.instance.NetworkManager.Shutdown();
         Debug.Log("I WANNA QUIT");
     }
-    void closePanels()
+    public void closePanels()
     {
         mainPanel.SetActive(false);
         additionalPanel.SetActive(false);
@@ -60,15 +60,15 @@ public class UI_Manager : MonoBehaviour
         string temp = portInput.text.Substring(0, portInput.text.Length - 2);
         transport.ConnectionData.Port = ushort.Parse(temp);
     }
-    public void OnHost(bool update=true)
+    public void OnHost()
     {
-        if(update)updateAddress();
+        updateAddress();
         GameNetworkManager.instance.NetworkManager.StartHost();
         closePanels();
     }
-    public void OnJoin(bool update=true)
+    public void OnJoin()
     {
-        if(update)updateAddress();
+        updateAddress();
         GameNetworkManager.instance.NetworkManager.StartClient();
         closePanels();
     }

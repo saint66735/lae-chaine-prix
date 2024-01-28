@@ -13,7 +13,8 @@ public class GameNetworkManager : NetworkBehaviour {
   public GameObject chainPrefab;
   public GameObject playerClientInstance;
   public static GameNetworkManager instance;
-  public List<NetworkObject> playerInstances;
+  //public List<NetworkObject> playerInstances;
+  public List<GameObject> playerInstances;
   public GameObject chain;
   public List<Transform> spawnPoints;
   public UI_Manager UIManagerScript;
@@ -31,12 +32,14 @@ public class GameNetworkManager : NetworkBehaviour {
       networkManager.StartServer();
     }
     else if (mppmTag.Contains("Host")) {
-      UIManagerScript.OnHost(false);
-      //networkManager.StartHost();
+      //UIManagerScript.OnHost();
+      networkManager.StartHost();
+      UIManagerScript.closePanels();
     }
     else if (mppmTag.Contains("Client")) {
-      UIManagerScript.OnJoin(false);
-      //networkManager.StartClient();
+      //UIManagerScript.OnJoin();
+      networkManager.StartClient();
+      UIManagerScript.closePanels();
     }
     
   }
@@ -63,6 +66,8 @@ public class GameNetworkManager : NetworkBehaviour {
   private void ConnectionApprovalCallback(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
   {
     Debug.Log("conection aproved");
+    GameObject go = (GameObject)Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
+    go.GetComponent<NetworkObject>().SpawnAsPlayerObject(request.ClientNetworkId, true);
     if (defaultAprovalCallback!=null) defaultAprovalCallback.Invoke(request,response);
     //playerInstances.Append(NetworkManager.Singleton.ConnectedClients[request.ClientNetworkId].PlayerObject);
     //foreach (var client in NetworkManager.Singleton.ConnectedClients.AsReadOnlyList()){
@@ -83,7 +88,7 @@ public class GameNetworkManager : NetworkBehaviour {
   }
  */
 
-  void SpawnChain(NetworkObject playerA, NetworkObject playerB) {
+  void SpawnChain(GameObject playerA, GameObject playerB) {
     chain = (GameObject)Instantiate(chainPrefab, Vector3.zero, Quaternion.identity);
     //var hingeA = chain.GetComponents<ConfigurableJoint>()[0];//chain.AddComponent<ConfigurableJoint>();
     //var hingeB = chain.GetComponents<ConfigurableJoint>()[1];//chain.AddComponent<ConfigurableJoint>();
@@ -107,9 +112,9 @@ public class GameNetworkManager : NetworkBehaviour {
   }
   // Update is called once per frame
   void Update() {
-    if (IsServer) {
-      var clientObjects = NetworkManager.Singleton.ConnectedClients.Select(x => x.Value.PlayerObject).AsReadOnlyList();
-      if (playerInstances == null || playerInstances.Count != clientObjects.Count) playerInstances = new List<NetworkObject>(clientObjects);
+    if (true || IsServer) {
+      var clientObjects = FindObjectsOfType<PlayerScript>().Select(x=>x.gameObject);
+      if (playerInstances == null || playerInstances.Count != clientObjects.Count()) playerInstances = new List<GameObject>(clientObjects);
     }
     //Debug.Log(playerInstances.Count);
     /*
